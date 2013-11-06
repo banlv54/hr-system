@@ -1,0 +1,47 @@
+<%= form_for @user do |f| %>
+
+  <%= render partial: "errors", locals: {object: @user} %>
+
+  <table class="formTbl contents">
+    <tr>
+      <th width="15%">Email</th>
+      <td><%= f.text_field :email %></td>
+    </tr>
+    <tr>
+      <th>Display name</th>
+      <td><%= f.text_field :display_name %></td>
+    </tr>
+    <tr>
+      <th>CradID</th>
+      <td><%= f.text_field :cardID %></td>
+    </tr>
+    <tr>
+      <th>Role</th>
+      <td>
+        <% RoleCategory.all.each do |role_category| %>
+          <%= role_category.name %>:
+          <% role_category.roles.each do |role| %>
+            <% user_role = 
+               @user.user_roles.detect { |user_role| user_role.role == role } ||
+               @user.user_roles.build(role_id: role.id).tap { |c| c.mark_for_destruction }
+            %>
+            <%= f.fields_for :user_roles, user_role do |role_fields| %>
+              <%= role_fields.hidden_field :role_id %>
+              <%= role_fields.check_box :_destroy, {checked: !user_role.marked_for_destruction?}, 0, 1 %>
+              <%= role.name %>
+            <% end %>
+          <% end %>
+          <br>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <th></th>
+      <td><%= f.check_box :issub %>SUB</td>
+    </tr>
+  </table>
+  <div class="form-actions">
+    <%= link_to "Back", :back, class: "btn" %>
+    <%= f.submit (action_name == "new" ? :Create : :Update), class:"btn #{action_name=='edit' ? 'btn-primary' : 'btn-warning'}" %>
+  </div>
+<% end %>

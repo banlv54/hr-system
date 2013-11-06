@@ -1,0 +1,24 @@
+<div id="error_explanation" class="alert alert-error hide">
+  <h2><%= t :error_title, scope: [:views, :labels, :search] %></h2>
+</div>
+
+<div class="ctsTit">
+  <h2><%= t(:title, scope: [:views, :labels, :search]) %></h2>
+</div>
+
+<%= form_for @search, url: request.path_info, html: {method: :get, id:'searchForm'} do |f| %>
+  <% if params[:per_page] %>
+    <%= hidden_field_tag :per_page, params[:per_page] %>
+  <% end %>
+
+  <%= render partial: (local_variables.include?(:form) && form || 'search_form'), locals: {f: f} %>
+
+  <% if (c = Settings.sort.send(controller_name).send(action_name) rescue nil).present? %>
+    <%= render partial: (local_variables.include?(:sort) && sort || 'sort'), locals: {f: f, c: c} %>
+  <% end %>
+
+  <div class="form-actions">
+    <%= link_to t(:clear, scope: [:helpers, :submit]), request.parameters.dup.replace(clear: true), class: 'btn' %>
+    <%= f.submit t(:search, scope: [:helpers, :submit]), class:"btn btn-primary" %>
+  </div>
+<% end %>
